@@ -1,0 +1,134 @@
+{
+  "sport": "football",
+  "generatedAt": "2026-05-14T12:00:00Z",
+  "events": [
+    {
+      "id": 5001,
+      "slug": "arsenal-vs-chelsea",
+      "status": "LIVE",
+      "minute": 53,
+      "period": "2H",
+      "startTime": "2026-05-14T12:30:00Z",
+      "isEditor": false,
+      "league": {
+        "id": 100,
+        "name": "Premier League",
+        "country": "England",
+        "slug": "premier-league"
+      },
+      "homeTeam": {
+        "id": 11,
+        "name": "Arsenal",
+        "shortName": "ARS",
+        "country": "England"
+      },
+      "awayTeam": {
+        "id": 12,
+        "name": "Chelsea",
+        "shortName": "CHE",
+        "country": "England"
+      },
+      "scores": {
+        "home": 2,
+        "away": 1
+      },
+      "venueName": "Emirates Stadium"
+    },
+    {
+      "id": 5002,
+      "slug": "liverpool-vs-manchester-city",
+      "status": "LIVE",
+      "minute": 18,
+      "period": "1H",
+      "startTime": "2026-05-14T13:00:00Z",
+      "isEditor": true,
+      "league": {
+        "id": 100,
+        "name": "Premier League",
+        "country": "England",
+        "slug": "premier-league"
+      },
+      "homeTeam": {
+        "id": 13,
+        "name": "Liverpool",
+        "shortName": "LIV",
+        "country": "England"
+      },
+      "awayTeam": {
+        "id": 14,
+        "name": "Manchester City",
+        "shortName": "MCI",
+        "country": "England"
+      },
+      "scores": {
+        "home": 0,
+        "away": 0
+      },
+      "venueName": "Anfield"
+    },
+    {
+      "id": 5003,
+      "slug": "inter-vs-milan",
+      "status": "LIVE",
+      "minute": 79,
+      "period": "2H",
+      "startTime": "2026-05-14T14:15:00Z",
+      "isEditor": false,
+      "league": {
+        "id": 101,
+        "name": "Serie A",
+        "country": "Italy",
+        "slug": "serie-a"
+      },
+      "homeTeam": {
+        "id": 15,
+        "name": "Inter",
+        "shortName": "INT",
+        "country": "Italy"
+      },
+      "awayTeam": {
+        "id": 16,
+        "name": "Milan",
+        "shortName": "MIL",
+        "country": "Italy"
+      },
+      "scores": {
+        "home": 1,
+        "away": 1
+      },
+      "venueName": "San Siro"
+    },
+    {
+      "id": 5004,
+      "slug": "barcelona-vs-atletico-madrid",
+      "status": "FINISHED",
+      "minute": 90,
+      "period": "FT",
+      "startTime": "2026-05-14T10:45:00Z",
+      "isEditor": false,
+      "league": {
+        "id": 102,
+        "name": "LaLiga",
+        "country": "Spain",
+        "slug": "laliga"
+      },
+      "homeTeam": {
+        "id": 17,
+        "name": "Barcelona",
+        "shortName": "BAR",
+        "country": "Spain"
+      },
+      "awayTeam": {
+        "id": 18,
+        "name": "Atletico Madrid",
+        "shortName": "ATM",
+        "country": "Spain"
+      },
+      "scores": {
+        "home": 3,
+        "away": 2
+      },
+      "venueName": "Estadi Olímpic Lluís Companys"
+    }
+  ]
+}
