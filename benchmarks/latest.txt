@@ -2,8 +2,8 @@ Mini SofaScore live endpoint benchmark
 iterations: 1000
 warmup: 100
 status_code: 200
-p50_ms: 2.843
-p95_ms: 4.215
-avg_ms: 3.058
-min_ms: 2.187
-max_ms: 30.410
+p50_ms: 2.421
+p95_ms: 4.473
+avg_ms: 2.673
+min_ms: 1.662
+max_ms: 22.820

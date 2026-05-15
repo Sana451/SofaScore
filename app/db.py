@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import Settings
+from .sources.football_data import normalize_football_data_payload
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 MIGRATION_PATH = BASE_DIR / "migrations" / "001_init.sql"
@@ -35,7 +36,7 @@ def database_is_empty(conn: sqlite3.Connection) -> bool:
 def initialize_database(settings: Settings) -> None:
     with connect(settings.db_path) as conn:
         apply_migrations(conn)
-        if settings.auto_seed and database_is_empty(conn):
+        if settings.should_seed_fixture and database_is_empty(conn):
             seed_from_fixture(conn, settings.fixture_path)
 
 
@@ -46,16 +47,51 @@ def seed_from_fixture(conn: sqlite3.Connection, fixture_path: Path) -> int:
 
 def ingest_raw_payload(conn: sqlite3.Connection, raw_payload: str, source: str) -> int:
     payload = json.loads(raw_payload)
+    normalized_events = []
+    for event in payload.get("events", []):
+        normalized_events.append(
+            {
+                "external_id": int(event["id"]),
+                "slug": event["slug"],
+                "status": str(event["status"]),
+                "period": event.get("period"),
+                "minute": event.get("minute"),
+                "home_score": int((event.get("scores") or {}).get("home", 0)),
+                "away_score": int((event.get("scores") or {}).get("away", 0)),
+                "start_time": event["startTime"],
+                "is_editor": bool(event.get("isEditor")),
+                "venue_name": event.get("venueName"),
+                "league": event["league"],
+                "home_team": event["homeTeam"],
+                "away_team": event["awayTeam"],
+            }
+        )
+    return ingest_normalized_events(conn, raw_payload, source, normalized_events)
+
+
+def ingest_football_data_payload(conn: sqlite3.Connection, raw_payload: str, source: str) -> int:
+    payload = json.loads(raw_payload)
+    normalized_events = normalize_football_data_payload(payload)
+    return ingest_normalized_events(conn, raw_payload, source, normalized_events)
+
+
+def ingest_normalized_events(
+    conn: sqlite3.Connection,
+    raw_payload: str,
+    source: str,
+    events: list[dict[str, Any]],
+) -> int:
     now = datetime.now(timezone.utc).isoformat()
     cursor = conn.execute(
         "INSERT INTO raw_snapshots (source, ingested_at, payload) VALUES (?, ?, ?)",
         (source, now, raw_payload),
     )
     raw_snapshot_id = int(cursor.lastrowid)
-    for event in payload.get("events", []):
+
+    for event in events:
         league_id = upsert_league(conn, event["league"], now)
-        home_team_id = upsert_team(conn, event["homeTeam"], now)
-        away_team_id = upsert_team(conn, event["awayTeam"], now)
+        home_team_id = upsert_team(conn, event["home_team"], now)
+        away_team_id = upsert_team(conn, event["away_team"], now)
         upsert_event(
             conn,
             raw_snapshot_id=raw_snapshot_id,
@@ -65,6 +101,7 @@ def ingest_raw_payload(conn: sqlite3.Connection, raw_payload: str, source: str) 
             event=event,
             updated_at=now,
         )
+
     conn.commit()
     return raw_snapshot_id
 
@@ -127,7 +164,6 @@ def upsert_event(
     event: dict[str, Any],
     updated_at: str,
 ) -> None:
-    scores = event.get("scores") or {}
     conn.execute(
         """
         INSERT INTO events (
@@ -164,7 +200,7 @@ def upsert_event(
             updated_at = excluded.updated_at
         """,
         (
-            int(event["id"]),
+            int(event["external_id"]),
             raw_snapshot_id,
             league_id,
             home_team_id,
@@ -173,11 +209,11 @@ def upsert_event(
             event["status"],
             event.get("period"),
             event.get("minute"),
-            int(scores.get("home", 0)),
-            int(scores.get("away", 0)),
-            event["startTime"],
-            1 if event.get("isEditor") else 0,
-            event.get("venueName"),
+            int(event.get("home_score", 0)),
+            int(event.get("away_score", 0)),
+            event["start_time"],
+            1 if event.get("is_editor") else 0,
+            event.get("venue_name"),
             updated_at,
         ),
     )
